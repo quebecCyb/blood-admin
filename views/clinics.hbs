@@ -18,7 +18,7 @@
                 <h3 class="text-themecolor">Dashboard</h3>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">Clinics</li>
                 </ol>
             </div>
             <div class="col-md-7 align-self-center">
@@ -39,7 +39,7 @@
                     <div class="card-body">
                         <div class="d-flex">
                             <div>
-                                <h5 class="card-title">Appointments</h5>
+                                <h5 class="card-title">Clinics</h5>
                             </div>
 <!--                            <div class="ms-auto">-->
 <!--                                <select class="form-select b-0">-->
@@ -56,32 +56,20 @@
                                 <thead>
                                     <tr>
                                         <th>Id</th>
-                                        <th>Donor</th>
                                         <th>Clinic</th>
-                                      <th>Date</th>
+                                        <th>B/H</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                  {{#each appointments}}
+                                  {{#each clinics}}
 
-                                    <tr onclick="window.location.href='/appointments/{{ID}}'">
+                                    <tr onclick="window.location.href='/clinics/{{ID}}'">
                                       <td>{{ID}}</td>
                                       <td>
-                                        {{#if donor}}
-                                          {{donor.name_donor}}
-                                        {{else}}
-                                          UNKNOWN
-                                        {{/if}}
+                                          {{clinic_name}}
                                       </td>
                                       <td>
-                                        {{#if clinic}}
-                                          {{clinic.clinic_name}}
-                                        {{else}}
-                                          UNKNOWN
-                                        {{/if}}
-                                      </td>
-                                      <td>
-                                        {{appointment_date}}
+                                        {{working_hours}}
                                       </td>
                                     </tr>
                                   {{/each}}
@@ -100,6 +88,8 @@
         <!-- ============================================================== -->
         <!-- Notification And Feeds -->
         <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- End Notification And Feeds -->
         <!-- ============================================================== -->
         <!-- ============================================================== -->
         <!-- End Page Content -->

@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Admin } from '../../../entities/Admin';
 import { createHmac } from 'crypto';
 import { Appointment } from 'src/entities/Appointment';
+import { Donor } from "../../../entities/Donor";
+import { Clinic } from "../../../entities/Clinic";
 
 const PERPAGE = 30;
 
@@ -13,18 +15,56 @@ export class AdminService {
     @InjectRepository(Admin)
     private adminRepository: Repository<Admin>,
 
-    
     @InjectRepository(Appointment)
     private appointmentRepository: Repository<Appointment>,
+
+    @InjectRepository(Donor)
+    private donorRepository: Repository<Donor>,
+
+    @InjectRepository(Clinic)
+    private clinicRepository: Repository<Clinic>,
   ) {}
 
-
-  findAppointments(page: number=0) {
-    return this.appointmentRepository.find({skip: page * PERPAGE, take: PERPAGE })
+  exists(username: string) {
+    return this.adminRepository.exists({
+      where: {
+        name_admin: username,
+      },
+    });
   }
 
+  findAppointments(page = 0) {
+    return this.appointmentRepository.find({
+      relations: ['donor', 'clinic'],
+      skip: page * PERPAGE,
+      take: PERPAGE,
+    });
+  }
+  findAppointment(id: number) {
+    return this.appointmentRepository.findOne({ relations: ['donor', 'clinic'], where: { ID: id || 0 } });
+  }
 
-  hashPassword(password: string, salt: string = 'skdafnefjej'): string {
+  findDonors(page = 0) {
+    return this.donorRepository.find({
+      skip: page * PERPAGE,
+      take: PERPAGE,
+    });
+  }
+  findDonor(id: number) {
+    return this.donorRepository.findOneBy({ ID: id || 0 });
+  }
+
+  findClinics(page = 0) {
+    return this.clinicRepository.find({
+      skip: page * PERPAGE,
+      take: PERPAGE,
+    });
+  }
+  findClinic(id: number) {
+    return this.clinicRepository.findOne({ where: { ID: id || 0 } });
+  }
+
+  hashPassword(password: string, salt = 'skdafnefjej'): string {
     const hash = createHmac('sha256', salt);
     hash.update(password);
     return hash.digest('hex');
@@ -35,7 +75,10 @@ export class AdminService {
     password: string,
   ): Promise<Admin | undefined> {
     return await this.adminRepository.findOne({
-      where: { name_admin: username, password: this.hashPassword(password, username) },
+      where: {
+        name_admin: username,
+        password: this.hashPassword(password, username),
+      },
     });
   }
 
@@ -45,13 +88,12 @@ export class AdminService {
   ): Promise<Admin | undefined> {
     const userData = {
       name_admin: username,
-      password: this.hashPassword(password, username)
-    }
+      password: this.hashPassword(password, username),
+    };
 
-    let user = await this.adminRepository.create(userData);
+    const user = await this.adminRepository.create(userData);
 
     await this.adminRepository.save(user);
     return user;
   }
 }
-

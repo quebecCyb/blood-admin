@@ -1,17 +1,41 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { donor } from './Donor';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Clinic } from "./Clinic";
+import { Donor } from "./Donor";
 
-@Entity('appointment', { schema: 'data_blood' })
+@Entity({ schema: 'data_blood' })
 export class Appointment {
   @PrimaryGeneratedColumn()
-  id: number;
+  ID: number;
 
-  @ManyToOne(() => donor, d => d.appointments)
-  donor: donor;
+  @Column({ type: 'bigint' })
+  clinic_ID: number;
 
-  @Column()
-  appointmentDate: Date;
+  @ManyToOne(() => Donor)
+  @JoinColumn({ name: 'donor_number_ID' })
+  donor: Donor;
 
-  @Column()
-  bloodType: string;
+  @ManyToOne(() => Clinic)
+  @JoinColumn({ name: 'clinic_ID' })
+  clinic: Clinic;
+
+  @Column({ type: 'bigint' })
+  donor_number_ID: number;
+
+  @Column({ type: 'smallint', nullable: true })
+  status_ID: number;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  registration_date: Date;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  appointment_date: Date;
+
+  @Column({ type: 'text', nullable: true })
+  analysis_file_path: string;
 }

@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { join } from 'path';
@@ -6,15 +6,17 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './guards/auth.guard';
+// import { APP_GUARD } from '@nestjs/core';
+// import { AuthGuard } from './guards/auth.guard';
 import { Admin } from './entities/Admin';
 import * as session from 'express-session';
 import { SessionModule } from 'nestjs-session';
 import * as process from 'process';
 import { JwtModule } from '@nestjs/jwt';
-import { config } from "dotenv";
-import { Appointment } from "./entities/Appointment";
+// import { config } from "dotenv";
+import { Appointment } from './entities/Appointment';
+import { Donor } from './entities/Donor';
+import { Clinic } from './entities/Clinic';
 
 @Module({
   imports: [
@@ -34,17 +36,17 @@ import { Appointment } from "./entities/Appointment";
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Admin, Appointment],
+      entities: [Admin, Appointment, Donor, Clinic],
       synchronize: false,
       logging: false,
-      driver: require('mysql2'), // добавьте эту строку
-      migrations: [__dirname + '/src/migrations/*.ts'],
+      // driver: require('mysql2'), // добавьте эту строку
+      // migrations: [__dirname + '/src/migrations/*.ts'],
       // cli: {
       //   migrationsDir: 'src/migrations',
       // },
@@ -54,14 +56,10 @@ import { Appointment } from "./entities/Appointment";
       signOptions: { expiresIn: '60m' }, // Token expiration time
     }),
     AdminModule,
- 
   ],
 
   controllers: [AppController],
-  providers: [
-    AppService,
-
-  ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

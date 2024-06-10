@@ -2,8 +2,9 @@
 import {
   Body,
   Controller,
-  Get,
-  Post, Redirect,
+  Get, Param, ParseIntPipe,
+  Post,
+  Redirect,
   Render,
   Req,
   UnauthorizedException,
@@ -24,7 +25,7 @@ export class AdminController {
   @Get('login')
   @Render('login') // Рендерим страницу администратора
   login() {
-    return {};
+    return { layout: 'e' };
   }
 
   @Post('login')
@@ -54,17 +55,16 @@ export class AdminController {
     return { message: 'Login first' };
   }
 
-  
   @Get('reg')
   @Render('reg') // Рендерим страницу администратора
   reg() {
-    return {};
+    return { layout: 'e' };
   }
-  
+
   @Get('logout')
   @Redirect('/login') // Рендерим страницу администратора
   logout(@Req() req: IRequest) {
-    delete req.session.jwt
+    delete req.session.jwt;
     return {};
   }
 
@@ -78,6 +78,11 @@ export class AdminController {
       return {
         message: '<script>\n' + 'window.location.href = "/";' + '</script>',
       };
+    }
+
+    // Validate user credentials (this is just a placeholder)
+    if (await this.service.exists(body.username)) {
+      throw new UnauthorizedException('Exists');
     }
 
     // Validate user credentials (this is just a placeholder)
@@ -99,17 +104,58 @@ export class AdminController {
   @UseGuards(AuthGuard)
   @Render('index')
   async index(@Req() req: IRequest) {
-    const appointments = await this.service.findAppointments(parseInt(`${req.query.page}`) || 0);
+    const appointments = await this.service.findAppointments(
+      parseInt(`${req.query.page}`) || 0,
+    );
     return { appointments };
   }
 
-  
   @Get('donors')
   @UseGuards(AuthGuard)
   @Render('donors')
-  async getAppointment() {
-    const appointments = await this.service.findAppointments();
-    return { appointments };
+  async donors(@Req() req: IRequest) {
+    const donors = await this.service.findDonors(
+      parseInt(`${req.query.page}`) || 0,
+    );
+    return { donors };
+  }
+  @Get('clinics')
+  @UseGuards(AuthGuard)
+  @Render('clinics')
+  async clinics(@Req() req: IRequest) {
+    const clinics = await this.service.findClinics(
+      parseInt(`${req.query.page}`) || 0,
+    );
+    return { clinics };
   }
 
+  @Get('appointments/:id')
+  @UseGuards(AuthGuard)
+  @Render('table')
+  async appointment(@Req() req: IRequest, @Param('id', ParseIntPipe) id: number) {
+    const appointment = await this.service.findAppointment(
+      id
+    );
+    return { table: Object.entries(appointment) };
+  }
+
+  @Get('clinics/:id')
+  @UseGuards(AuthGuard)
+  @Render('table')
+  async clinic(@Req() req: IRequest, @Param('id', ParseIntPipe) id: number) {
+    const clinic = await this.service.findClinic(
+      id
+    );
+    return { table: Object.entries(clinic) };
+  }
+
+  @Get('donors/:id')
+  @UseGuards(AuthGuard)
+  @Render('table')
+  async donor(@Req() req: IRequest, @Param('id', ParseIntPipe) id: number) {
+    const donor = await this.service.findDonor(
+      id
+    );
+    return { table: Object.entries(donor) };
+  }
 }

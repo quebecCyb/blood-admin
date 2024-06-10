@@ -1,19 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Clinic } from './Clinic';
 
-@Entity({ schema: 'admin', name: 'admin' })
+@Entity({ schema: 'admin' })
 export class Admin {
   @PrimaryGeneratedColumn()
   ID: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50 })
   name_admin: string;
 
-  @Column()
+  @Column({ type: 'text' })
   password: string;
 
-  @Column({ nullable: true })
-  clinic_ID?: number;
+  @Column({ type: 'bigint' })
+  clinic_ID: number;
 
-  @Column({default: ''})
-  admin_has_news?: string = '';
+  @ManyToOne(() => Clinic)
+  @JoinColumn({ name: 'clinic_ID' })
+  clinic: Clinic;
 }

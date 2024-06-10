@@ -1,28 +1,35 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Appointment } from "./Appointment";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+} from 'typeorm';
 
-@Entity({ schema: 'donor', name: 'donor' })
-export class donor {
+@Entity({ schema: 'donor' })
+export class Donor {
+  @PrimaryGeneratedColumn()
+  ID: number;
 
-    
-    @PrimaryGeneratedColumn()
-    ID: number;
+  @Column({ type: 'varchar', length: 20 })
+  name_donor: string;
 
+  @Column({ type: 'varchar', length: 20 })
+  surname_donor: string;
 
-    @OneToMany(() => Appointment, a => a.donor)
-    appointments: Appointment[];
+  @Column({ type: 'date' })
+  date_of_birth: Date;
 
-    @Column({default: ''})
-    name_donor: string;
+  @Column({ type: 'smallint', nullable: true })
+  gender_ID: number;
 
-    @Column()
-    surname_donor: string;
-    
-    @Column()
-    password: string;
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email: string;
 
-    @Column({default: false})
-    date_of_birth: string;
+  @Column({ type: 'bigint', nullable: true, unique: true })
+  telegram_ID: number;
 
+  @Column({ type: 'text' })
+  password: string;
+
+  @Column({ type: 'bigint', nullable: true })
+  language_ID: number;
 }
-
